@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Intake Form</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 1.5rem;
+      color: #111;
+    }
+
+    /* Progress bar */
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .progress::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #ddd;
+      z-index: 0;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .progress-step .circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #ddd;
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .progress-step.active .circle {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .progress-step.completed .circle {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .progress-step .label {
+      font-size: 0.65rem;
+      margin-top: 4px;
+      color: #999;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .progress-step.active .label,
+    .progress-step.completed .label {
+      color: #333;
+    }
+
+    /* Form card */
+    .form-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .step h2 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* Field groups */
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    .field input[type="text"],
+    .field input[type="email"],
+    .field input[type="tel"],
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .field.error input,
+    .field.error textarea {
+      border-color: #dc2626;
+    }
+
+    .field .error-msg {
+      color: #dc2626;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field.error .error-msg {
+      display: block;
+    }
+
+    /* Radio groups */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .radio-group label:hover {
+      background: #f9fafb;
+    }
+
+    .radio-group input:checked + span {
+      color: #2563eb;
+      font-weight: 500;
+    }
+
+    .radio-group label:has(input:checked) {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .field.error .radio-group {
+      padding: 4px;
+      border-radius: 8px;
+      outline: 2px solid #dc2626;
+      outline-offset: 2px;
+    }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-back {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-back:hover { background: #d1d5db; }
+
+    .btn-next {
+      background: #2563eb;
+      color: #fff;
+      margin-left: auto;
+    }
+
+    .btn-next:hover { background: #1d4ed8; }
+
+    .btn-submit {
+      background: #16a34a;
+      color: #fff;
+      margin-left: auto;
+    }
+
+    .btn-submit:hover { background: #15803d; }
+
+    .btn-back.hidden { visibility: hidden; }
+
+    /* Success state */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success h2 {
+      color: #16a34a;
+      margin-bottom: 12px;
+    }
+
+    .success p {
+      color: #666;
+    }
+
+    @media (max-width: 500px) {
+      body { padding: 12px; }
+      .form-card { padding: 20px; }
+      .progress-step .label { font-size: 0.55rem; }
+      .radio-group { flex-direction: column; }
+      .buttons { gap: 12px; }
+      .btn { padding: 10px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Project Intake Form</h1>
+
+  <!-- Progress indicator -->
+  <div class="progress" id="progress">
+    <div class="progress-step active" data-step="1">
+      <div class="circle">1</div>
+      <div class="label">Project</div>
+    </div>
+    <div class="progress-step" data-step="2">
+      <div class="circle">2</div>
+      <div class="label">Features</div>
+    </div>
+    <div class="progress-step" data-step="3">
+      <div class="circle">3</div>
+      <div class="label">Technical</div>
+    </div>
+    <div class="progress-step" data-step="4">
+      <div class="circle">4</div>
+      <div class="label">Design</div>
+    </div>
+    <div class="progress-step" data-step="5">
+      <div class="circle">5</div>
+      <div class="label">Budget</div>
+    </div>
+    <div class="progress-step" data-step="6">
+      <div class="circle">6</div>
+      <div class="label">Contact</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <!-- Step 1: Project Type -->
+    <div class="step active" data-step="1">
+      <h2>Step 1: Project Type</h2>
+
+      <div class="field" data-required="radio" data-name="projectType">
+        <label>What type of project do you need?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="projectType" value="Website"><span>Website</span></label>
+          <label><input type="radio" name="projectType" value="Web Application"><span>Web Application</span></label>
+          <label><input type="radio" name="projectType" value="Both"><span>Both</span></label>
+        </div>
+        <div class="error-msg">Please select a project type.</div>
+      </div>
+
+      <div class="field" data-required="text" data-name="mainPurpose">
+        <label>What's the main purpose?</label>
+        <input type="text" name="mainPurpose" placeholder="e.g., online store, booking system, portfolio">
+        <div class="error-msg">Please describe the main purpose.</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Core Features -->
+    <div class="step" data-step="2">
+      <h2>Step 2: Core Features</h2>
+
+      <div class="field" data-required="text" data-name="keyFeatures">
+        <label>List the key features you need</label>
+        <textarea name="keyFeatures" placeholder="e.g., user login, payment processing, admin dashboard"></textarea>
+        <div class="error-msg">Please list at least one feature.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="userAccounts">
+        <label>Do users need accounts/login?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="userAccounts" value="Yes"><span>Yes</span></label>
+          <label><input type="radio" name="userAccounts" value="No"><span>No</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="needDatabase">
+        <label>Do you need a database?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="needDatabase" value="Yes"><span>Yes</span></label>
+          <label><input type="radio" name="needDatabase" value="No"><span>No</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+    </div>
+
+    <!-- Step 3: Integrations & Technical -->
+    <div class="step" data-step="3">
+      <h2>Step 3: Integrations & Technical</h2>
+
+      <div class="field" data-required="text" data-name="integrations">
+        <label>Any integrations needed?</label>
+        <textarea name="integrations" placeholder="e.g., payment gateway, email service, existing systems"></textarea>
+        <div class="error-msg">Please describe any integrations (or type "None").</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="offlineSupport">
+        <label>Need it to work offline?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="offlineSupport" value="Yes"><span>Yes</span></label>
+          <label><input type="radio" name="offlineSupport" value="No"><span>No</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="adminPanel">
+        <label>Need an admin panel?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="adminPanel" value="Yes"><span>Yes</span></label>
+          <label><input type="radio" name="adminPanel" value="No"><span>No</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+    </div>
+
+    <!-- Step 4: Design & Branding -->
+    <div class="step" data-step="4">
+      <h2>Step 4: Design & Branding</h2>
+
+      <div class="field" data-required="radio" data-name="existingBranding">
+        <label>Do you have existing branding?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="existingBranding" value="Yes - have logo/colors"><span>Yes - have logo/colors</span></label>
+          <label><input type="radio" name="existingBranding" value="No - need help with branding"><span>No - need help with branding</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-name="designInspiration">
+        <label>Websites you like the look of?</label>
+        <input type="text" name="designInspiration" placeholder="paste URLs separated by commas">
+      </div>
+
+      <div class="field" data-name="functionalityInspiration">
+        <label>Websites you like the functionality of?</label>
+        <input type="text" name="functionalityInspiration" placeholder="paste URLs">
+      </div>
+    </div>
+
+    <!-- Step 5: Timeline & Budget -->
+    <div class="step" data-step="5">
+      <h2>Step 5: Timeline & Budget</h2>
+
+      <div class="field" data-required="radio" data-name="timeline">
+        <label>Timeline?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="timeline" value="Urgent - 2-4 weeks"><span>Urgent - 2-4 weeks</span></label>
+          <label><input type="radio" name="timeline" value="Standard - 1-2 months"><span>Standard - 1-2 months</span></label>
+          <label><input type="radio" name="timeline" value="Flexible - 3+ months"><span>Flexible - 3+ months</span></label>
+        </div>
+        <div class="error-msg">Please select a timeline.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="budget">
+        <label>Budget range?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="budget" value="<R15,000"><span>&lt;R15,000</span></label>
+          <label><input type="radio" name="budget" value="R15,000-R30,000"><span>R15,000-R30,000</span></label>
+          <label><input type="radio" name="budget" value="R30,000-R50,000"><span>R30,000-R50,000</span></label>
+          <label><input type="radio" name="budget" value="R50,000+"><span>R50,000+</span></label>
+        </div>
+        <div class="error-msg">Please select a budget range.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="maintenance">
+        <label>Need ongoing maintenance?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="maintenance" value="Yes"><span>Yes</span></label>
+          <label><input type="radio" name="maintenance" value="No"><span>No</span></label>
+          <label><input type="radio" name="maintenance" value="Not sure"><span>Not sure</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+    </div>
+
+    <!-- Step 6: Contact Details -->
+    <div class="step" data-step="6">
+      <h2>Step 6: Contact Details</h2>
+
+      <div class="field" data-required="text" data-name="name">
+        <label>Name *</label>
+        <input type="text" name="name" placeholder="Your full name">
+        <div class="error-msg">Please enter your name.</div>
+      </div>
+
+      <div class="field" data-name="company">
+        <label>Company name</label>
+        <input type="text" name="company" placeholder="Your company name">
+      </div>
+
+      <div class="field" data-required="email" data-name="email">
+        <label>Email *</label>
+        <input type="email" name="email" placeholder="you@example.com">
+        <div class="error-msg">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field" data-required="text" data-name="phone">
+        <label>Phone *</label>
+        <input type="tel" name="phone" placeholder="Your phone number">
+        <div class="error-msg">Please enter your phone number.</div>
+      </div>
+    </div>
+
+    <!-- Success message -->
+    <div class="success" id="success">
+      <h2>Thank you!</h2>
+      <p>Your project details have been submitted. Check the browser console to see the submitted data.</p>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="buttons" id="buttons">
+      <button class="btn btn-back hidden" id="btnBack">Back</button>
+      <button class="btn btn-next" id="btnNext">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const totalSteps = 6;
+  let currentStep = 1;
+  const formData = {};
+
+  const btnBack = document.getElementById("btnBack");
+  const btnNext = document.getElementById("btnNext");
+  const buttonsRow = document.getElementById("buttons");
+
+  // Validate all required fields in the current step
+  function validateStep(step) {
+    const stepEl = document.querySelector(`.step[data-step="${step}"]`);
+    const fields = stepEl.querySelectorAll(".field[data-required]");
+    let valid = true;
+
+    fields.forEach(function (field) {
+      const type = field.getAttribute("data-required");
+      const name = field.getAttribute("data-name");
+      field.classList.remove("error");
+
+      if (type === "radio") {
+        const checked = field.querySelector('input[type="radio"]:checked');
+        if (!checked) {
+          field.classList.add("error");
+          valid = false;
+        }
+      } else if (type === "text") {
+        const input = field.querySelector("input, textarea");
+        if (!input.value.trim()) {
+          field.classList.add("error");
+          valid = false;
+        }
+      } else if (type === "email") {
+        const input = field.querySelector("input");
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(input.value.trim())) {
+          field.classList.add("error");
+          valid = false;
+        }
+      }
+    });
+
+    return valid;
+  }
+
+  // Collect data from the current step
+  function collectStep(step) {
+    const stepEl = document.querySelector(`.step[data-step="${step}"]`);
+    const fields = stepEl.querySelectorAll(".field[data-name]");
+
+    fields.forEach(function (field) {
+      const name = field.getAttribute("data-name");
+      const radio = field.querySelector('input[type="radio"]:checked');
+      if (radio) {
+        formData[name] = radio.value;
+        return;
+      }
+      const input = field.querySelector("input, textarea");
+      if (input) {
+        formData[name] = input.value.trim();
+      }
+    });
+  }
+
+  // Show a specific step
+  function showStep(step) {
+    // Update step panels
+    document.querySelectorAll(".step").forEach(function (el) {
+      el.classList.remove("active");
+    });
+    document.querySelector(`.step[data-step="${step}"]`).classList.add("active");
+
+    // Update progress indicators
+    document.querySelectorAll(".progress-step").forEach(function (el) {
+      const s = parseInt(el.getAttribute("data-step"));
+      el.classList.remove("active", "completed");
+      if (s === step) el.classList.add("active");
+      else if (s < step) el.classList.add("completed");
+    });
+
+    // Update buttons
+    btnBack.classList.toggle("hidden", step === 1);
+
+    if (step === totalSteps) {
+      btnNext.style.display = "none";
+      // Show submit button
+      if (!document.getElementById("btnSubmit")) {
+        const submitBtn = document.createElement("button");
+        submitBtn.id = "btnSubmit";
+        submitBtn.className = "btn btn-submit";
+        submitBtn.textContent = "Submit";
+        submitBtn.addEventListener("click", handleSubmit);
+        buttonsRow.appendChild(submitBtn);
+      }
+      document.getElementById("btnSubmit").style.display = "";
+    } else {
+      btnNext.style.display = "";
+      const submitBtn = document.getElementById("btnSubmit");
+      if (submitBtn) submitBtn.style.display = "none";
+    }
+
+    currentStep = step;
+  }
+
+  function handleSubmit() {
+    if (!validateStep(currentStep)) return;
+    collectStep(currentStep);
+
+    console.log("=== CLIENT INTAKE FORM SUBMISSION ===");
+    console.log(JSON.stringify(formData, null, 2));
+
+    // Show success state
+    document.querySelectorAll(".step").forEach(function (el) {
+      el.classList.remove("active");
+    });
+    document.getElementById("success").style.display = "block";
+    buttonsRow.style.display = "none";
+
+    // Mark all progress steps as completed
+    document.querySelectorAll(".progress-step").forEach(function (el) {
+      el.classList.remove("active");
+      el.classList.add("completed");
+    });
+  }
+
+  btnNext.addEventListener("click", function () {
+    if (!validateStep(currentStep)) return;
+    collectStep(currentStep);
+    if (currentStep < totalSteps) {
+      showStep(currentStep + 1);
+    }
+  });
+
+  btnBack.addEventListener("click", function () {
+    if (currentStep > 1) {
+      collectStep(currentStep);
+      showStep(currentStep - 1);
+    }
+  });
+
+  // Clear error state on input
+  document.addEventListener("change", function (e) {
+    const field = e.target.closest(".field");
+    if (field) field.classList.remove("error");
+  });
+  document.addEventListener("input", function (e) {
+    const field = e.target.closest(".field");
+    if (field) field.classList.remove("error");
+  });
+</script>
+
+</body>
+</html>
