@@ -17,15 +17,22 @@
     }
 
     .container {
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 8px;
       font-size: 1.5rem;
       color: #111;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 28px;
     }
 
     /* Progress bar */
@@ -65,7 +72,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       transition: background 0.3s, color 0.3s;
     }
@@ -81,7 +88,7 @@
     }
 
     .progress-step .label {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       margin-top: 4px;
       color: #999;
       text-align: center;
@@ -105,27 +112,42 @@
     .step.active { display: block; }
 
     .step h2 {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .step-description {
+      font-size: 0.85rem;
+      color: #666;
       margin-bottom: 20px;
-      padding-bottom: 12px;
+      padding-bottom: 16px;
       border-bottom: 1px solid #eee;
     }
 
     /* Field groups */
     .field {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    .field label {
+    .field > label {
       display: block;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
       font-size: 0.9rem;
+    }
+
+    .field .hint {
+      display: block;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 8px;
+      line-height: 1.4;
     }
 
     .field input[type="text"],
     .field input[type="email"],
     .field input[type="tel"],
+    .field input[type="url"],
     .field textarea {
       width: 100%;
       padding: 10px 12px;
@@ -205,6 +227,48 @@
       outline-offset: 2px;
     }
 
+    /* Checkbox groups */
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .checkbox-group label:hover {
+      background: #f9fafb;
+    }
+
+    .checkbox-group input:checked + span {
+      color: #2563eb;
+      font-weight: 500;
+    }
+
+    .checkbox-group label:has(input:checked) {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .field.error .checkbox-group {
+      padding: 4px;
+      border-radius: 8px;
+      outline: 2px solid #dc2626;
+      outline-offset: 2px;
+    }
+
     /* Buttons */
     .buttons {
       display: flex;
@@ -268,8 +332,8 @@
     @media (max-width: 500px) {
       body { padding: 12px; }
       .form-card { padding: 20px; }
-      .progress-step .label { font-size: 0.55rem; }
-      .radio-group { flex-direction: column; }
+      .progress-step .label { font-size: 0.5rem; }
+      .radio-group, .checkbox-group { flex-direction: column; }
       .buttons { gap: 12px; }
       .btn { padding: 10px 20px; }
     }
@@ -279,6 +343,7 @@
 
 <div class="container">
   <h1>Project Intake Form</h1>
+  <p class="subtitle">Help us understand your project so we can give you an accurate quote and timeline.</p>
 
   <!-- Progress indicator -->
   <div class="progress" id="progress">
@@ -288,198 +353,527 @@
     </div>
     <div class="progress-step" data-step="2">
       <div class="circle">2</div>
-      <div class="label">Features</div>
+      <div class="label">Audience</div>
     </div>
     <div class="progress-step" data-step="3">
       <div class="circle">3</div>
-      <div class="label">Technical</div>
+      <div class="label">Features</div>
     </div>
     <div class="progress-step" data-step="4">
       <div class="circle">4</div>
-      <div class="label">Design</div>
+      <div class="label">Technical</div>
     </div>
     <div class="progress-step" data-step="5">
       <div class="circle">5</div>
-      <div class="label">Budget</div>
+      <div class="label">Design</div>
     </div>
     <div class="progress-step" data-step="6">
       <div class="circle">6</div>
+      <div class="label">Content</div>
+    </div>
+    <div class="progress-step" data-step="7">
+      <div class="circle">7</div>
+      <div class="label">Budget</div>
+    </div>
+    <div class="progress-step" data-step="8">
+      <div class="circle">8</div>
       <div class="label">Contact</div>
     </div>
   </div>
 
   <div class="form-card">
-    <!-- Step 1: Project Type -->
+
+    <!-- ============================================ -->
+    <!-- STEP 1: Project Overview                     -->
+    <!-- ============================================ -->
     <div class="step active" data-step="1">
-      <h2>Step 1: Project Type</h2>
+      <h2>Step 1: Project Overview</h2>
+      <p class="step-description">Let's start with the big picture. This helps us understand the type and scope of what you need.</p>
 
       <div class="field" data-required="radio" data-name="projectType">
         <label>What type of project do you need?</label>
+        <span class="hint">A website displays information (like a brochure). A web application lets users do things (like log in, place orders, manage data).</span>
         <div class="radio-group">
           <label><input type="radio" name="projectType" value="Website"><span>Website</span></label>
           <label><input type="radio" name="projectType" value="Web Application"><span>Web Application</span></label>
           <label><input type="radio" name="projectType" value="Both"><span>Both</span></label>
+          <label><input type="radio" name="projectType" value="Not sure"><span>Not sure yet</span></label>
         </div>
         <div class="error-msg">Please select a project type.</div>
       </div>
 
       <div class="field" data-required="text" data-name="mainPurpose">
-        <label>What's the main purpose?</label>
-        <input type="text" name="mainPurpose" placeholder="e.g., online store, booking system, portfolio">
-        <div class="error-msg">Please describe the main purpose.</div>
+        <label>What is the main goal of this project?</label>
+        <span class="hint">What should this website/app achieve for your business? Think about the #1 thing you want visitors or users to do.</span>
+        <textarea name="mainPurpose" placeholder="e.g., Sell handmade furniture online, Let customers book appointments, Showcase our portfolio to attract new clients, Replace our spreadsheet-based inventory system"></textarea>
+        <div class="error-msg">Please describe the main goal.</div>
+      </div>
+
+      <div class="field" data-required="text" data-name="problemSolving">
+        <label>What problem does this solve?</label>
+        <span class="hint">What's not working right now? Are you losing customers, spending too much time on manual tasks, or missing out on opportunities?</span>
+        <textarea name="problemSolving" placeholder="e.g., We're losing sales because we don't have an online presence. Our current booking system is manual and we double-book constantly. Customers can't find our pricing without calling us."></textarea>
+        <div class="error-msg">Please describe the problem this solves.</div>
+      </div>
+
+      <div class="field" data-name="existingSite">
+        <label>Do you have an existing website?</label>
+        <span class="hint">If yes, paste the URL. If this is a rebuild, we'll review what's working and what isn't.</span>
+        <input type="text" name="existingSite" placeholder="e.g., www.mycompany.co.za (or leave blank if no existing site)">
+      </div>
+
+      <div class="field" data-name="existingSitePain">
+        <label>If you have an existing site, what's wrong with it?</label>
+        <span class="hint">This tells us what to avoid and what to prioritise in the new build.</span>
+        <textarea name="existingSitePain" placeholder="e.g., It looks outdated, it's slow, customers say they can't find things, we can't update content ourselves, it's not mobile-friendly"></textarea>
       </div>
     </div>
 
-    <!-- Step 2: Core Features -->
+    <!-- ============================================ -->
+    <!-- STEP 2: Target Audience                      -->
+    <!-- ============================================ -->
     <div class="step" data-step="2">
-      <h2>Step 2: Core Features</h2>
+      <h2>Step 2: Target Audience</h2>
+      <p class="step-description">Understanding who will use your site/app is critical. It affects every design and technical decision we make.</p>
 
-      <div class="field" data-required="text" data-name="keyFeatures">
-        <label>List the key features you need</label>
-        <textarea name="keyFeatures" placeholder="e.g., user login, payment processing, admin dashboard"></textarea>
-        <div class="error-msg">Please list at least one feature.</div>
+      <div class="field" data-required="text" data-name="targetAudience">
+        <label>Who are your primary users/customers?</label>
+        <span class="hint">Be specific. "Everyone" isn't helpful - who would you most want to visit your site?</span>
+        <textarea name="targetAudience" placeholder="e.g., Small business owners aged 30-50 in Gauteng, Parents looking for after-school activities, Restaurant managers who need to manage online orders"></textarea>
+        <div class="error-msg">Please describe your target audience.</div>
       </div>
 
-      <div class="field" data-required="radio" data-name="userAccounts">
-        <label>Do users need accounts/login?</label>
+      <div class="field" data-required="radio" data-name="audienceAge">
+        <label>What age group is your primary audience?</label>
+        <span class="hint">This affects design style, font sizes, and how complex the interface can be.</span>
         <div class="radio-group">
-          <label><input type="radio" name="userAccounts" value="Yes"><span>Yes</span></label>
-          <label><input type="radio" name="userAccounts" value="No"><span>No</span></label>
+          <label><input type="radio" name="audienceAge" value="18-25"><span>18-25</span></label>
+          <label><input type="radio" name="audienceAge" value="25-40"><span>25-40</span></label>
+          <label><input type="radio" name="audienceAge" value="40-60"><span>40-60</span></label>
+          <label><input type="radio" name="audienceAge" value="60+"><span>60+</span></label>
+          <label><input type="radio" name="audienceAge" value="All ages"><span>All ages</span></label>
+        </div>
+        <div class="error-msg">Please select an age group.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="audienceDevice">
+        <label>How will most of your audience access the site?</label>
+        <span class="hint">This determines our mobile-first vs. desktop-first approach and impacts layout decisions heavily.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="audienceDevice" value="Mostly mobile"><span>Mostly mobile</span></label>
+          <label><input type="radio" name="audienceDevice" value="Mostly desktop"><span>Mostly desktop</span></label>
+          <label><input type="radio" name="audienceDevice" value="Even split"><span>Even split</span></label>
+          <label><input type="radio" name="audienceDevice" value="Not sure"><span>Not sure</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
       </div>
 
-      <div class="field" data-required="radio" data-name="needDatabase">
-        <label>Do you need a database?</label>
+      <div class="field" data-required="radio" data-name="audienceTechLevel">
+        <label>How tech-savvy is your audience?</label>
+        <span class="hint">This affects how simple the interface needs to be. A tool for developers can be more complex than one for retirees.</span>
         <div class="radio-group">
-          <label><input type="radio" name="needDatabase" value="Yes"><span>Yes</span></label>
-          <label><input type="radio" name="needDatabase" value="No"><span>No</span></label>
+          <label><input type="radio" name="audienceTechLevel" value="Very comfortable with technology"><span>Very tech-savvy</span></label>
+          <label><input type="radio" name="audienceTechLevel" value="Average - can use apps and websites"><span>Average - uses apps fine</span></label>
+          <label><input type="radio" name="audienceTechLevel" value="Low - needs things very simple"><span>Low - needs things very simple</span></label>
+          <label><input type="radio" name="audienceTechLevel" value="Mixed"><span>Mixed</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-name="competitors">
+        <label>Who are your main competitors?</label>
+        <span class="hint">Share their websites if you can. We'll review what they do well and where you can stand out.</span>
+        <textarea name="competitors" placeholder="e.g., CompanyA (www.companya.co.za) - they have a great booking system. CompanyB (www.companyb.co.za) - their site looks modern but is hard to navigate."></textarea>
       </div>
     </div>
 
-    <!-- Step 3: Integrations & Technical -->
+    <!-- ============================================ -->
+    <!-- STEP 3: Features & Functionality             -->
+    <!-- ============================================ -->
     <div class="step" data-step="3">
-      <h2>Step 3: Integrations & Technical</h2>
+      <h2>Step 3: Features & Functionality</h2>
+      <p class="step-description">Select the features you need. Don't worry if you're unsure about some - we'll discuss these in detail later.</p>
 
-      <div class="field" data-required="text" data-name="integrations">
-        <label>Any integrations needed?</label>
-        <textarea name="integrations" placeholder="e.g., payment gateway, email service, existing systems"></textarea>
-        <div class="error-msg">Please describe any integrations (or type "None").</div>
+      <div class="field" data-required="checkbox" data-name="coreFeatures">
+        <label>Which of these features do you need? (select all that apply)</label>
+        <span class="hint">Tick everything that might apply. It's easier to remove features later than to add them.</span>
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="coreFeatures" value="User registration/login"><span>User registration/login</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Online payments"><span>Online payments</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Shopping cart / e-commerce"><span>Shopping cart / e-commerce</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Booking / scheduling"><span>Booking / scheduling</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Contact form"><span>Contact form</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Search functionality"><span>Search functionality</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Maps / location"><span>Maps / location</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Blog / news section"><span>Blog / news section</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Photo gallery / portfolio"><span>Photo gallery / portfolio</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Video content"><span>Video content</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Reviews / testimonials"><span>Reviews / testimonials</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Social media feeds"><span>Social media feeds</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Newsletter signup"><span>Newsletter signup</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Live chat / chatbot"><span>Live chat / chatbot</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="File uploads / downloads"><span>File uploads / downloads</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Multi-language support"><span>Multi-language support</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Admin dashboard"><span>Admin dashboard</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Notifications (email/SMS)"><span>Notifications (email/SMS)</span></label>
+          <label><input type="checkbox" name="coreFeatures" value="Reporting / analytics"><span>Reporting / analytics</span></label>
+        </div>
+        <div class="error-msg">Please select at least one feature.</div>
       </div>
 
-      <div class="field" data-required="radio" data-name="offlineSupport">
-        <label>Need it to work offline?</label>
+      <div class="field" data-name="featuresDetail">
+        <label>Describe your most important features in more detail</label>
+        <span class="hint">For the features you ticked above, explain how they should work. The more detail, the more accurate our quote.</span>
+        <textarea name="featuresDetail" placeholder="e.g., Users should be able to create accounts using email or Google login. The booking system needs to show available time slots and send confirmation emails. The admin dashboard should let us see all orders and export them to CSV."></textarea>
+      </div>
+
+      <div class="field" data-required="radio" data-name="userTypes">
+        <label>How many types of users will the system have?</label>
+        <span class="hint">e.g., "just visitors" = 1 type. "Customers + admins" = 2 types. "Buyers + sellers + admins" = 3 types. Each user type adds complexity.</span>
         <div class="radio-group">
-          <label><input type="radio" name="offlineSupport" value="Yes"><span>Yes</span></label>
-          <label><input type="radio" name="offlineSupport" value="No"><span>No</span></label>
+          <label><input type="radio" name="userTypes" value="Just visitors (no accounts)"><span>Just visitors (no accounts)</span></label>
+          <label><input type="radio" name="userTypes" value="1 type (e.g., customers)"><span>1 type (e.g., customers)</span></label>
+          <label><input type="radio" name="userTypes" value="2 types (e.g., customers + admin)"><span>2 types (e.g., customers + admin)</span></label>
+          <label><input type="radio" name="userTypes" value="3+ types"><span>3+ types (complex roles)</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
       </div>
 
-      <div class="field" data-required="radio" data-name="adminPanel">
-        <label>Need an admin panel?</label>
+      <div class="field" data-name="userTypesDetail">
+        <label>If you have multiple user types, describe what each type needs to do</label>
+        <span class="hint">This is one of the biggest cost drivers. Be as specific as possible.</span>
+        <textarea name="userTypesDetail" placeholder="e.g., Customers: browse products, add to cart, checkout, view order history. Staff: manage products, process orders, view reports. Admin: everything staff can do plus manage staff accounts and settings."></textarea>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 4: Integrations & Technical             -->
+    <!-- ============================================ -->
+    <div class="step" data-step="4">
+      <h2>Step 4: Integrations & Technical</h2>
+      <p class="step-description">These questions help us plan the architecture. If you're unsure about something, pick "Not sure" - we'll advise you.</p>
+
+      <div class="field" data-name="integrations">
+        <label>Do you need to connect to any external services?</label>
+        <span class="hint">These are third-party tools your site/app needs to talk to. Each integration adds development time.</span>
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="integrations" value="Payment gateway (Payfast, Stripe, etc.)"><span>Payment gateway (Payfast, Stripe, etc.)</span></label>
+          <label><input type="checkbox" name="integrations" value="Email marketing (Mailchimp, etc.)"><span>Email marketing (Mailchimp, etc.)</span></label>
+          <label><input type="checkbox" name="integrations" value="Accounting (Xero, Sage, etc.)"><span>Accounting (Xero, Sage, etc.)</span></label>
+          <label><input type="checkbox" name="integrations" value="CRM (HubSpot, Salesforce, etc.)"><span>CRM (HubSpot, Salesforce, etc.)</span></label>
+          <label><input type="checkbox" name="integrations" value="Shipping / courier"><span>Shipping / courier</span></label>
+          <label><input type="checkbox" name="integrations" value="Social media"><span>Social media</span></label>
+          <label><input type="checkbox" name="integrations" value="Google Maps"><span>Google Maps</span></label>
+          <label><input type="checkbox" name="integrations" value="WhatsApp"><span>WhatsApp</span></label>
+          <label><input type="checkbox" name="integrations" value="Calendar / scheduling"><span>Calendar / scheduling</span></label>
+          <label><input type="checkbox" name="integrations" value="SMS gateway"><span>SMS gateway</span></label>
+        </div>
+      </div>
+
+      <div class="field" data-name="integrationsOther">
+        <label>Any other systems this needs to connect to?</label>
+        <span class="hint">Existing software your business already uses, internal databases, APIs, etc.</span>
+        <textarea name="integrationsOther" placeholder="e.g., We use a custom stock management system that has an API. We need to pull product data from our supplier's system. We use Google Workspace for email."></textarea>
+      </div>
+
+      <div class="field" data-required="radio" data-name="dataAmount">
+        <label>How much data/content will the site handle?</label>
+        <span class="hint">This affects database design, hosting requirements, and cost. A 20-page brochure site is very different from a 10,000-product store.</span>
         <div class="radio-group">
-          <label><input type="radio" name="adminPanel" value="Yes"><span>Yes</span></label>
-          <label><input type="radio" name="adminPanel" value="No"><span>No</span></label>
+          <label><input type="radio" name="dataAmount" value="Small (under 50 pages/items)"><span>Small (under 50 pages/items)</span></label>
+          <label><input type="radio" name="dataAmount" value="Medium (50-500 pages/items)"><span>Medium (50-500)</span></label>
+          <label><input type="radio" name="dataAmount" value="Large (500-5000)"><span>Large (500-5,000)</span></label>
+          <label><input type="radio" name="dataAmount" value="Very large (5000+)"><span>Very large (5,000+)</span></label>
+          <label><input type="radio" name="dataAmount" value="Not sure"><span>Not sure</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="expectedTraffic">
+        <label>How many visitors/users do you expect per month?</label>
+        <span class="hint">An estimate is fine. This affects hosting costs and performance requirements.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="expectedTraffic" value="Under 1,000"><span>Under 1,000</span></label>
+          <label><input type="radio" name="expectedTraffic" value="1,000-10,000"><span>1,000-10,000</span></label>
+          <label><input type="radio" name="expectedTraffic" value="10,000-100,000"><span>10,000-100,000</span></label>
+          <label><input type="radio" name="expectedTraffic" value="100,000+"><span>100,000+</span></label>
+          <label><input type="radio" name="expectedTraffic" value="No idea"><span>No idea</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="hosting">
+        <label>Do you have hosting and a domain name?</label>
+        <span class="hint">If you already have hosting we can work with it, or we can set up hosting for you. Domain = your website address (e.g., mycompany.co.za).</span>
+        <div class="radio-group">
+          <label><input type="radio" name="hosting" value="Have both"><span>Have both</span></label>
+          <label><input type="radio" name="hosting" value="Have domain only"><span>Have domain only</span></label>
+          <label><input type="radio" name="hosting" value="Have hosting only"><span>Have hosting only</span></label>
+          <label><input type="radio" name="hosting" value="Need both"><span>Need both</span></label>
+          <label><input type="radio" name="hosting" value="Not sure"><span>Not sure</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
       </div>
     </div>
 
-    <!-- Step 4: Design & Branding -->
-    <div class="step" data-step="4">
-      <h2>Step 4: Design & Branding</h2>
+    <!-- ============================================ -->
+    <!-- STEP 5: Design & Branding                    -->
+    <!-- ============================================ -->
+    <div class="step" data-step="5">
+      <h2>Step 5: Design & Branding</h2>
+      <p class="step-description">Design is more than making things look pretty - it's about communicating the right message to your audience.</p>
 
       <div class="field" data-required="radio" data-name="existingBranding">
         <label>Do you have existing branding?</label>
+        <span class="hint">Branding = your logo, brand colours, fonts, and visual style. If you have a brand guide or style document, even better.</span>
         <div class="radio-group">
-          <label><input type="radio" name="existingBranding" value="Yes - have logo/colors"><span>Yes - have logo/colors</span></label>
-          <label><input type="radio" name="existingBranding" value="No - need help with branding"><span>No - need help with branding</span></label>
+          <label><input type="radio" name="existingBranding" value="Yes - full brand guide"><span>Yes - full brand guide (logo, colours, fonts)</span></label>
+          <label><input type="radio" name="existingBranding" value="Partial - have a logo"><span>Partial - have a logo but not much else</span></label>
+          <label><input type="radio" name="existingBranding" value="No - need everything"><span>No - need help with everything</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
       </div>
 
+      <div class="field" data-required="radio" data-name="designTone">
+        <label>What feeling should the site convey?</label>
+        <span class="hint">This guides our colour choices, typography, spacing, and imagery style.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="designTone" value="Professional / corporate"><span>Professional / corporate</span></label>
+          <label><input type="radio" name="designTone" value="Friendly / approachable"><span>Friendly / approachable</span></label>
+          <label><input type="radio" name="designTone" value="Bold / edgy"><span>Bold / edgy</span></label>
+          <label><input type="radio" name="designTone" value="Minimal / clean"><span>Minimal / clean</span></label>
+          <label><input type="radio" name="designTone" value="Luxurious / premium"><span>Luxurious / premium</span></label>
+          <label><input type="radio" name="designTone" value="Fun / playful"><span>Fun / playful</span></label>
+        </div>
+        <div class="error-msg">Please select a tone.</div>
+      </div>
+
       <div class="field" data-name="designInspiration">
-        <label>Websites you like the look of?</label>
-        <input type="text" name="designInspiration" placeholder="paste URLs separated by commas">
+        <label>Share 2-3 websites you like the LOOK of</label>
+        <span class="hint">These don't need to be in your industry. We want to understand your taste - colours, layout, typography, imagery.</span>
+        <textarea name="designInspiration" placeholder="e.g., www.example1.com - I like the clean layout and big images&#10;www.example2.com - Love their colour scheme&#10;www.example3.com - The typography feels premium"></textarea>
       </div>
 
       <div class="field" data-name="functionalityInspiration">
-        <label>Websites you like the functionality of?</label>
-        <input type="text" name="functionalityInspiration" placeholder="paste URLs">
+        <label>Share 2-3 websites you like the FUNCTIONALITY of</label>
+        <span class="hint">Sites where you thought "I wish our site could do that." Focus on how things work, not how they look.</span>
+        <textarea name="functionalityInspiration" placeholder="e.g., www.example1.com - Their booking flow is really smooth&#10;www.example2.com - The product filters are really useful&#10;www.example3.com - I like how they handle customer reviews"></textarea>
+      </div>
+
+      <div class="field" data-name="designDislikes">
+        <label>Anything you definitely DON'T want?</label>
+        <span class="hint">Knowing what you dislike is just as useful as knowing what you like. Saves everyone time.</span>
+        <textarea name="designDislikes" placeholder="e.g., No dark backgrounds, no stock photos of people shaking hands, no auto-playing videos, don't want it to look like a generic template"></textarea>
+      </div>
+
+      <div class="field" data-required="radio" data-name="needPhotography">
+        <label>Do you have professional photos/images for the site?</label>
+        <span class="hint">Good imagery makes a huge difference. If you don't have any, we can organise stock photos or a photoshoot.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="needPhotography" value="Yes - have professional photos"><span>Yes - have professional photos</span></label>
+          <label><input type="radio" name="needPhotography" value="Have some, need more"><span>Have some, need more</span></label>
+          <label><input type="radio" name="needPhotography" value="No - need help sourcing"><span>No - need help sourcing</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
       </div>
     </div>
 
-    <!-- Step 5: Timeline & Budget -->
-    <div class="step" data-step="5">
-      <h2>Step 5: Timeline & Budget</h2>
+    <!-- ============================================ -->
+    <!-- STEP 6: Content & SEO                        -->
+    <!-- ============================================ -->
+    <div class="step" data-step="6">
+      <h2>Step 6: Content & SEO</h2>
+      <p class="step-description">Content is what actually goes on the site - text, images, videos. Bad content on a great site still won't convert visitors.</p>
+
+      <div class="field" data-required="radio" data-name="contentReady">
+        <label>Do you have your content (text) ready?</label>
+        <span class="hint">This is one of the biggest causes of project delays. Be honest about where you are - we can help.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="contentReady" value="Yes - all written and ready"><span>Yes - all written and ready</span></label>
+          <label><input type="radio" name="contentReady" value="Partially - some done"><span>Partially - some pages done</span></label>
+          <label><input type="radio" name="contentReady" value="No - need copywriting help"><span>No - need copywriting help</span></label>
+          <label><input type="radio" name="contentReady" value="No - will write it myself"><span>No - will write it myself</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="contentUpdates">
+        <label>How often will the content need updating?</label>
+        <span class="hint">This determines whether you need a content management system (CMS) or if static pages are fine.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="contentUpdates" value="Rarely (a few times a year)"><span>Rarely (a few times a year)</span></label>
+          <label><input type="radio" name="contentUpdates" value="Monthly"><span>Monthly</span></label>
+          <label><input type="radio" name="contentUpdates" value="Weekly"><span>Weekly</span></label>
+          <label><input type="radio" name="contentUpdates" value="Daily"><span>Daily</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="contentEditor">
+        <label>Who will update the content after launch?</label>
+        <span class="hint">If your team will manage content, we need to build an easy-to-use editing interface. If we manage it, we'll set up a maintenance plan.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="contentEditor" value="Our team (non-technical)"><span>Our team (non-technical)</span></label>
+          <label><input type="radio" name="contentEditor" value="Our team (has some tech skills)"><span>Our team (some tech skills)</span></label>
+          <label><input type="radio" name="contentEditor" value="We want you to manage it"><span>We want you to manage it</span></label>
+          <label><input type="radio" name="contentEditor" value="Not sure yet"><span>Not sure yet</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="seoImportance">
+        <label>How important is appearing in Google search results?</label>
+        <span class="hint">SEO (search engine optimisation) helps people find you on Google. It's an ongoing effort, not a one-time setup.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="seoImportance" value="Critical - main source of customers"><span>Critical - main source of customers</span></label>
+          <label><input type="radio" name="seoImportance" value="Important but not primary"><span>Important but not primary</span></label>
+          <label><input type="radio" name="seoImportance" value="Nice to have"><span>Nice to have</span></label>
+          <label><input type="radio" name="seoImportance" value="Not relevant (internal app)"><span>Not relevant (internal app)</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-name="seoKeywords">
+        <label>What would people search for to find your business?</label>
+        <span class="hint">Think about what your ideal customer would type into Google. This helps us plan the content strategy.</span>
+        <textarea name="seoKeywords" placeholder="e.g., Cape Town wedding photographer, affordable web design South Africa, best pizza delivery Sandton, online accounting software for small business"></textarea>
+      </div>
+
+      <div class="field" data-name="pagesList">
+        <label>List the main pages you think you'll need</label>
+        <span class="hint">Don't overthink this - we'll refine it together. Just give us a starting point.</span>
+        <textarea name="pagesList" placeholder="e.g., Home, About Us, Services (with sub-pages for each service), Portfolio, Pricing, Blog, Contact, FAQ"></textarea>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 7: Timeline & Budget                    -->
+    <!-- ============================================ -->
+    <div class="step" data-step="7">
+      <h2>Step 7: Timeline & Budget</h2>
+      <p class="step-description">Being upfront about timeline and budget helps us propose the right solution. We can often find creative ways to deliver within constraints.</p>
 
       <div class="field" data-required="radio" data-name="timeline">
-        <label>Timeline?</label>
+        <label>When do you need this launched?</label>
+        <span class="hint">Rushed timelines may limit features or increase costs. If there's a specific event/date driving this, mention it below.</span>
         <div class="radio-group">
-          <label><input type="radio" name="timeline" value="Urgent - 2-4 weeks"><span>Urgent - 2-4 weeks</span></label>
+          <label><input type="radio" name="timeline" value="ASAP - 2-4 weeks"><span>ASAP - 2-4 weeks</span></label>
           <label><input type="radio" name="timeline" value="Standard - 1-2 months"><span>Standard - 1-2 months</span></label>
+          <label><input type="radio" name="timeline" value="Comfortable - 2-3 months"><span>Comfortable - 2-3 months</span></label>
           <label><input type="radio" name="timeline" value="Flexible - 3+ months"><span>Flexible - 3+ months</span></label>
         </div>
         <div class="error-msg">Please select a timeline.</div>
       </div>
 
+      <div class="field" data-name="launchDeadline">
+        <label>Is there a hard deadline? If so, why?</label>
+        <span class="hint">e.g., a product launch, seasonal sale, funding milestone. This helps us prioritise what gets built first.</span>
+        <input type="text" name="launchDeadline" placeholder="e.g., Need to launch before Black Friday (29 Nov), Opening a new store in March">
+      </div>
+
       <div class="field" data-required="radio" data-name="budget">
-        <label>Budget range?</label>
+        <label>What's your budget range for the initial build?</label>
+        <span class="hint">This isn't about getting the cheapest price - it helps us recommend the right approach. A R15k site and a R50k site solve very different problems.</span>
         <div class="radio-group">
-          <label><input type="radio" name="budget" value="<R15,000"><span>&lt;R15,000</span></label>
-          <label><input type="radio" name="budget" value="R15,000-R30,000"><span>R15,000-R30,000</span></label>
-          <label><input type="radio" name="budget" value="R30,000-R50,000"><span>R30,000-R50,000</span></label>
-          <label><input type="radio" name="budget" value="R50,000+"><span>R50,000+</span></label>
+          <label><input type="radio" name="budget" value="Under R15,000"><span>Under R15,000</span></label>
+          <label><input type="radio" name="budget" value="R15,000-R30,000"><span>R15,000 - R30,000</span></label>
+          <label><input type="radio" name="budget" value="R30,000-R50,000"><span>R30,000 - R50,000</span></label>
+          <label><input type="radio" name="budget" value="R50,000-R100,000"><span>R50,000 - R100,000</span></label>
+          <label><input type="radio" name="budget" value="R100,000+"><span>R100,000+</span></label>
+          <label><input type="radio" name="budget" value="Not sure - need guidance"><span>Not sure - need guidance</span></label>
         </div>
         <div class="error-msg">Please select a budget range.</div>
       </div>
 
       <div class="field" data-required="radio" data-name="maintenance">
-        <label>Need ongoing maintenance?</label>
+        <label>Do you need ongoing maintenance and support after launch?</label>
+        <span class="hint">Websites need regular updates, security patches, backups, and bug fixes. Think of it like servicing a car.</span>
         <div class="radio-group">
-          <label><input type="radio" name="maintenance" value="Yes"><span>Yes</span></label>
-          <label><input type="radio" name="maintenance" value="No"><span>No</span></label>
-          <label><input type="radio" name="maintenance" value="Not sure"><span>Not sure</span></label>
+          <label><input type="radio" name="maintenance" value="Yes - full maintenance"><span>Yes - full maintenance</span></label>
+          <label><input type="radio" name="maintenance" value="Yes - just security updates"><span>Yes - just security updates</span></label>
+          <label><input type="radio" name="maintenance" value="No - we'll handle it"><span>No - we'll handle it</span></label>
+          <label><input type="radio" name="maintenance" value="Not sure"><span>Not sure yet</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="phased">
+        <label>Would you consider a phased approach?</label>
+        <span class="hint">We can launch with core features first, then add more over time. This spreads the cost and gets you live sooner.</span>
+        <div class="radio-group">
+          <label><input type="radio" name="phased" value="Yes - launch basic, add features later"><span>Yes - launch basic, add later</span></label>
+          <label><input type="radio" name="phased" value="No - need everything at launch"><span>No - need everything at launch</span></label>
+          <label><input type="radio" name="phased" value="Open to discussing"><span>Open to discussing</span></label>
         </div>
         <div class="error-msg">Please select an option.</div>
       </div>
     </div>
 
-    <!-- Step 6: Contact Details -->
-    <div class="step" data-step="6">
-      <h2>Step 6: Contact Details</h2>
+    <!-- ============================================ -->
+    <!-- STEP 8: Contact Details                      -->
+    <!-- ============================================ -->
+    <div class="step" data-step="8">
+      <h2>Step 8: Contact Details</h2>
+      <p class="step-description">Last step! We'll use these details to send you a proposal. We typically respond within 1-2 business days.</p>
 
-      <div class="field" data-required="text" data-name="name">
-        <label>Name *</label>
-        <input type="text" name="name" placeholder="Your full name">
+      <div class="field" data-required="text" data-name="contactName">
+        <label>Your full name *</label>
+        <input type="text" name="contactName" placeholder="e.g., John Smith">
         <div class="error-msg">Please enter your name.</div>
       </div>
 
-      <div class="field" data-name="company">
-        <label>Company name</label>
-        <input type="text" name="company" placeholder="Your company name">
+      <div class="field" data-name="contactCompany">
+        <label>Company / business name</label>
+        <input type="text" name="contactCompany" placeholder="e.g., Smith & Co Trading">
       </div>
 
-      <div class="field" data-required="email" data-name="email">
-        <label>Email *</label>
-        <input type="email" name="email" placeholder="you@example.com">
+      <div class="field" data-name="contactRole">
+        <label>Your role</label>
+        <span class="hint">Helps us understand who we're speaking to and who makes decisions on the project.</span>
+        <input type="text" name="contactRole" placeholder="e.g., Owner, Marketing Manager, CTO">
+      </div>
+
+      <div class="field" data-required="email" data-name="contactEmail">
+        <label>Email address *</label>
+        <input type="email" name="contactEmail" placeholder="you@company.co.za">
         <div class="error-msg">Please enter a valid email address.</div>
       </div>
 
-      <div class="field" data-required="text" data-name="phone">
-        <label>Phone *</label>
-        <input type="tel" name="phone" placeholder="Your phone number">
+      <div class="field" data-required="text" data-name="contactPhone">
+        <label>Phone number *</label>
+        <span class="hint">We'll only call if we need to clarify something quickly. WhatsApp-friendly number preferred.</span>
+        <input type="tel" name="contactPhone" placeholder="e.g., 082 123 4567">
         <div class="error-msg">Please enter your phone number.</div>
+      </div>
+
+      <div class="field" data-required="radio" data-name="contactMethod">
+        <label>Preferred way to communicate? *</label>
+        <div class="radio-group">
+          <label><input type="radio" name="contactMethod" value="Email"><span>Email</span></label>
+          <label><input type="radio" name="contactMethod" value="WhatsApp"><span>WhatsApp</span></label>
+          <label><input type="radio" name="contactMethod" value="Phone call"><span>Phone call</span></label>
+          <label><input type="radio" name="contactMethod" value="Video call"><span>Video call (Zoom/Teams)</span></label>
+        </div>
+        <div class="error-msg">Please select an option.</div>
+      </div>
+
+      <div class="field" data-name="referral">
+        <label>How did you hear about us?</label>
+        <input type="text" name="referral" placeholder="e.g., Google search, referral from a friend, saw your work on Instagram">
+      </div>
+
+      <div class="field" data-name="anythingElse">
+        <label>Anything else we should know?</label>
+        <span class="hint">Past bad experiences with developers, specific concerns, accessibility requirements, anything at all.</span>
+        <textarea name="anythingElse" placeholder="e.g., We had a developer ghost us halfway through our last project so communication is really important to us. We need the site to be POPIA compliant."></textarea>
       </div>
     </div>
 
     <!-- Success message -->
     <div class="success" id="success">
       <h2>Thank you!</h2>
-      <p>Your project details have been submitted. Check the browser console to see the submitted data.</p>
+      <p>Your project details have been submitted successfully.<br>We'll review everything and get back to you within 1-2 business days.</p>
+      <p style="margin-top: 16px; font-size: 0.85rem; color: #999;">Check the browser console (F12) to see the submitted data.</p>
     </div>
 
     <!-- Navigation buttons -->
@@ -491,40 +885,45 @@
 </div>
 
 <script>
-  const totalSteps = 6;
-  let currentStep = 1;
-  const formData = {};
+  var totalSteps = 8;
+  var currentStep = 1;
+  var formData = {};
 
-  const btnBack = document.getElementById("btnBack");
-  const btnNext = document.getElementById("btnNext");
-  const buttonsRow = document.getElementById("buttons");
+  var btnBack = document.getElementById("btnBack");
+  var btnNext = document.getElementById("btnNext");
+  var buttonsRow = document.getElementById("buttons");
 
   // Validate all required fields in the current step
   function validateStep(step) {
-    const stepEl = document.querySelector(`.step[data-step="${step}"]`);
-    const fields = stepEl.querySelectorAll(".field[data-required]");
-    let valid = true;
+    var stepEl = document.querySelector('.step[data-step="' + step + '"]');
+    var fields = stepEl.querySelectorAll(".field[data-required]");
+    var valid = true;
 
     fields.forEach(function (field) {
-      const type = field.getAttribute("data-required");
-      const name = field.getAttribute("data-name");
+      var type = field.getAttribute("data-required");
       field.classList.remove("error");
 
       if (type === "radio") {
-        const checked = field.querySelector('input[type="radio"]:checked');
+        var checked = field.querySelector('input[type="radio"]:checked');
         if (!checked) {
           field.classList.add("error");
           valid = false;
         }
+      } else if (type === "checkbox") {
+        var checked = field.querySelectorAll('input[type="checkbox"]:checked');
+        if (checked.length === 0) {
+          field.classList.add("error");
+          valid = false;
+        }
       } else if (type === "text") {
-        const input = field.querySelector("input, textarea");
+        var input = field.querySelector("input, textarea");
         if (!input.value.trim()) {
           field.classList.add("error");
           valid = false;
         }
       } else if (type === "email") {
-        const input = field.querySelector("input");
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        var input = field.querySelector("input");
+        var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailPattern.test(input.value.trim())) {
           field.classList.add("error");
           valid = false;
@@ -532,22 +931,43 @@
       }
     });
 
+    // Scroll to first error
+    var firstError = stepEl.querySelector(".field.error");
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
     return valid;
   }
 
   // Collect data from the current step
   function collectStep(step) {
-    const stepEl = document.querySelector(`.step[data-step="${step}"]`);
-    const fields = stepEl.querySelectorAll(".field[data-name]");
+    var stepEl = document.querySelector('.step[data-step="' + step + '"]');
+    var fields = stepEl.querySelectorAll(".field[data-name]");
 
     fields.forEach(function (field) {
-      const name = field.getAttribute("data-name");
-      const radio = field.querySelector('input[type="radio"]:checked');
+      var name = field.getAttribute("data-name");
+
+      // Checkboxes - collect as array
+      var checkboxes = field.querySelectorAll('input[type="checkbox"]');
+      if (checkboxes.length > 0) {
+        var values = [];
+        checkboxes.forEach(function (cb) {
+          if (cb.checked) values.push(cb.value);
+        });
+        formData[name] = values;
+        return;
+      }
+
+      // Radios
+      var radio = field.querySelector('input[type="radio"]:checked');
       if (radio) {
         formData[name] = radio.value;
         return;
       }
-      const input = field.querySelector("input, textarea");
+
+      // Text inputs / textareas
+      var input = field.querySelector("input, textarea");
       if (input) {
         formData[name] = input.value.trim();
       }
@@ -556,15 +976,14 @@
 
   // Show a specific step
   function showStep(step) {
-    // Update step panels
     document.querySelectorAll(".step").forEach(function (el) {
       el.classList.remove("active");
     });
-    document.querySelector(`.step[data-step="${step}"]`).classList.add("active");
+    document.querySelector('.step[data-step="' + step + '"]').classList.add("active");
 
     // Update progress indicators
     document.querySelectorAll(".progress-step").forEach(function (el) {
-      const s = parseInt(el.getAttribute("data-step"));
+      var s = parseInt(el.getAttribute("data-step"));
       el.classList.remove("active", "completed");
       if (s === step) el.classList.add("active");
       else if (s < step) el.classList.add("completed");
@@ -575,9 +994,8 @@
 
     if (step === totalSteps) {
       btnNext.style.display = "none";
-      // Show submit button
       if (!document.getElementById("btnSubmit")) {
-        const submitBtn = document.createElement("button");
+        var submitBtn = document.createElement("button");
         submitBtn.id = "btnSubmit";
         submitBtn.className = "btn btn-submit";
         submitBtn.textContent = "Submit";
@@ -587,11 +1005,14 @@
       document.getElementById("btnSubmit").style.display = "";
     } else {
       btnNext.style.display = "";
-      const submitBtn = document.getElementById("btnSubmit");
+      var submitBtn = document.getElementById("btnSubmit");
       if (submitBtn) submitBtn.style.display = "none";
     }
 
     currentStep = step;
+
+    // Scroll to top of form
+    document.querySelector(".form-card").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function handleSubmit() {
@@ -601,14 +1022,12 @@
     console.log("=== CLIENT INTAKE FORM SUBMISSION ===");
     console.log(JSON.stringify(formData, null, 2));
 
-    // Show success state
     document.querySelectorAll(".step").forEach(function (el) {
       el.classList.remove("active");
     });
     document.getElementById("success").style.display = "block";
     buttonsRow.style.display = "none";
 
-    // Mark all progress steps as completed
     document.querySelectorAll(".progress-step").forEach(function (el) {
       el.classList.remove("active");
       el.classList.add("completed");
@@ -630,13 +1049,13 @@
     }
   });
 
-  // Clear error state on input
+  // Clear error state on interaction
   document.addEventListener("change", function (e) {
-    const field = e.target.closest(".field");
+    var field = e.target.closest(".field");
     if (field) field.classList.remove("error");
   });
   document.addEventListener("input", function (e) {
-    const field = e.target.closest(".field");
+    var field = e.target.closest(".field");
     if (field) field.classList.remove("error");
   });
 </script>
