@@ -873,7 +873,7 @@
     <div class="success" id="success">
       <h2>Thank you!</h2>
       <p>Your project details have been submitted successfully.<br>We'll review everything and get back to you within 1-2 business days.</p>
-      <p style="margin-top: 16px; font-size: 0.85rem; color: #999;">Check the browser console (F12) to see the submitted data.</p>
+      <p class="submit-error" id="submitError" style="display:none; margin-top: 16px; color: #dc2626; font-size: 0.85rem;">There was a problem saving your submission. Your data has been logged to the browser console as a backup. Please contact us directly.</p>
     </div>
 
     <!-- Navigation buttons -->
@@ -1015,23 +1015,93 @@
     document.querySelector(".form-card").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function handleSubmit() {
-    if (!validateStep(currentStep)) return;
-    collectStep(currentStep);
+  // =====================================================
+  // GOOGLE SHEETS SETUP INSTRUCTIONS
+  // =====================================================
+  // 1. Create a new Google Sheet
+  // 2. Go to Extensions > Apps Script
+  // 3. Delete any code there and paste this:
+  //
+  //    function doPost(e) {
+  //      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  //      var data = JSON.parse(e.postData.contents);
+  //
+  //      // Add headers on first submission
+  //      if (sheet.getLastRow() === 0) {
+  //        var headers = ["Timestamp"].concat(Object.keys(data));
+  //        sheet.appendRow(headers);
+  //      }
+  //
+  //      // Build row matching header order
+  //      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  //      var row = headers.map(function(header) {
+  //        if (header === "Timestamp") return new Date().toISOString();
+  //        var val = data[header];
+  //        if (Array.isArray(val)) return val.join(", ");
+  //        return val || "";
+  //      });
+  //
+  //      sheet.appendRow(row);
+  //
+  //      return ContentService
+  //        .createTextOutput(JSON.stringify({ status: "ok" }))
+  //        .setMimeType(ContentService.MimeType.JSON);
+  //    }
+  //
+  // 4. Click Deploy > New deployment
+  // 5. Type = "Web app"
+  // 6. Execute as = "Me", Who has access = "Anyone"
+  // 7. Click Deploy and copy the URL
+  // 8. Paste that URL below:
+  // =====================================================
 
-    console.log("=== CLIENT INTAKE FORM SUBMISSION ===");
-    console.log(JSON.stringify(formData, null, 2));
+  var GOOGLE_SHEETS_URL = ""; // <-- Paste your Apps Script web app URL here
 
+  function showSuccess() {
     document.querySelectorAll(".step").forEach(function (el) {
       el.classList.remove("active");
     });
     document.getElementById("success").style.display = "block";
     buttonsRow.style.display = "none";
-
     document.querySelectorAll(".progress-step").forEach(function (el) {
       el.classList.remove("active");
       el.classList.add("completed");
     });
+  }
+
+  function handleSubmit() {
+    if (!validateStep(currentStep)) return;
+    collectStep(currentStep);
+
+    // Always log to console as backup
+    console.log("=== CLIENT INTAKE FORM SUBMISSION ===");
+    console.log(JSON.stringify(formData, null, 2));
+
+    // Disable submit button while sending
+    var submitBtn = document.getElementById("btnSubmit");
+    submitBtn.textContent = "Submitting...";
+    submitBtn.disabled = true;
+
+    // Send to Google Sheets if URL is configured
+    if (GOOGLE_SHEETS_URL) {
+      fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(function () {
+        showSuccess();
+      })
+      .catch(function (err) {
+        console.error("Failed to save to Google Sheets:", err);
+        showSuccess();
+        document.getElementById("submitError").style.display = "block";
+      });
+    } else {
+      console.warn("GOOGLE_SHEETS_URL is not set. Submission only logged to console.");
+      showSuccess();
+    }
   }
 
   btnNext.addEventListener("click", function () {
