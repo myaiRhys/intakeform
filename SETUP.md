@@ -1,96 +1,114 @@
-# Google Sheets Integration Setup
+# Firebase Setup
 
-Form submissions are sent to a Google Sheet. Follow these steps to set it up.
+Form submissions are saved to Firebase Firestore. Free tier gives you 1GB storage and 50,000 reads/day - more than enough for an intake form.
 
-## 1. Create the Google Sheet
+## 1. Create a Firebase Project
 
-- Go to [sheets.google.com](https://sheets.google.com) and create a new blank spreadsheet
-- Name it something like "Client Intake Submissions"
+1. Go to [console.firebase.google.com](https://console.firebase.google.com)
+2. Click **Add project**
+3. Give it a name (e.g., "client-intake")
+4. Disable Google Analytics if you don't need it (keeps things simpler)
+5. Click **Create project**
 
-## 2. Add the Apps Script
+## 2. Create the Firestore Database
 
-- In your new sheet, go to **Extensions > Apps Script**
-- Delete any code already there
-- Paste the following:
+1. In the left sidebar, click **Build > Firestore Database**
+2. Click **Create database**
+3. Choose a location closest to your clients (e.g., `europe-west1` for South Africa)
+4. Select **Start in test mode** (allows read/write for 30 days - see security section below)
+5. Click **Create**
+
+## 3. Register a Web App
+
+1. On the project overview page, click the web icon (`</>`) to add a web app
+2. Give it a nickname (e.g., "intake-form")
+3. You do NOT need Firebase Hosting - leave that unchecked
+4. Click **Register app**
+5. You'll see a `firebaseConfig` object - copy those values
+
+## 4. Add Your Config to the Form
+
+Open `index.html` and find the `firebaseConfig` object near the top of the `<script>` section:
 
 ```javascript
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-
-  // Add headers on first submission
-  if (sheet.getLastRow() === 0) {
-    var headers = ["Timestamp"].concat(Object.keys(data));
-    sheet.appendRow(headers);
-  }
-
-  // Build row matching header order
-  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  var row = headers.map(function(header) {
-    if (header === "Timestamp") return new Date().toISOString();
-    var val = data[header];
-    if (Array.isArray(val)) return val.join(", ");
-    return val || "";
-  });
-
-  sheet.appendRow(row);
-
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: "ok" }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+var firebaseConfig = {
+  apiKey: "",            // <-- Paste your values here
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
 ```
 
-- Click **Save** (Ctrl+S)
-
-## 3. Deploy as Web App
-
-1. Click **Deploy > New deployment**
-2. Click the gear icon next to "Select type" and choose **Web app**
-3. Set:
-   - **Description**: "Intake form handler" (optional)
-   - **Execute as**: "Me"
-   - **Who has access**: "Anyone"
-4. Click **Deploy**
-5. Authorise the app when prompted (click through the "unsafe" warning - it's your own script)
-6. **Copy the Web app URL** - it looks like: `https://script.google.com/macros/s/ABCDEF.../exec`
-
-## 4. Add the URL to the Form
-
-Open `index.html` and find this line near the top of the `<script>` section:
+Paste in your values from step 3. It'll look something like:
 
 ```javascript
-var GOOGLE_SHEETS_URL = ""; // <-- Paste your Apps Script web app URL here
-```
-
-Paste your URL between the quotes:
-
-```javascript
-var GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+var firebaseConfig = {
+  apiKey: "AIzaSyD-abc123...",
+  authDomain: "client-intake.firebaseapp.com",
+  projectId: "client-intake",
+  storageBucket: "client-intake.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123..."
+};
 ```
 
 ## 5. Test It
 
-- Open `index.html` in a browser
-- Fill out and submit the form
-- Check your Google Sheet - a new row should appear within a few seconds
+1. Open `index.html` in a browser
+2. Fill out the form and submit
+3. Go to your Firebase console > Firestore Database
+4. You should see a **submissions** collection with a new document containing all the form data
+
+## Where to Find Submissions
+
+In the Firebase console:
+- Go to **Firestore Database**
+- Click on the **submissions** collection
+- Each submission is a document with a random ID
+- Click any document to see all the fields and values
+- The `submittedAt` field shows when it was submitted
+
+## Security Rules (Important)
+
+Test mode expires after 30 days. Before it does, update your Firestore security rules to only allow writes (not reads) from the public:
+
+1. Go to **Firestore Database > Rules**
+2. Replace the rules with:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /submissions/{document} {
+      allow create: if true;      // Anyone can submit the form
+      allow read, update, delete: if false;  // Only you can view/edit/delete via console
+    }
+  }
+}
+```
+
+3. Click **Publish**
+
+This means:
+- The form can create new submissions (that's all it needs)
+- Nobody can read, edit, or delete submissions from the frontend
+- You manage submissions through the Firebase console only
 
 ## How It Works
 
-- On submit, the form sends a JSON object to your Apps Script URL via `fetch()`
-- The Apps Script receives it, parses it, and appends a row to your sheet
-- The first submission auto-creates column headers from the field names
-- Arrays (like the features checklist) are joined with commas
-- A timestamp is added automatically
+- When a client submits the form, all their answers are collected into a JavaScript object
+- A `submittedAt` timestamp is added
+- The object is saved as a new document in the `submissions` collection in Firestore
 - The data is also logged to the browser console as a backup
+- If the save fails (network issue, etc.), the success screen shows with an error message telling the client to contact you directly
 
-## Updating the Script
+## Cost
 
-If you add or remove form fields, the script handles it automatically - new fields get new columns on the next submission. You don't need to redeploy.
+Firebase Spark (free) plan includes:
+- 1 GiB Firestore storage
+- 50,000 reads / day
+- 20,000 writes / day
 
-However, if you change the script code itself, you need to:
-1. Go to Apps Script
-2. Click **Deploy > Manage deployments**
-3. Click the pencil icon on your deployment
-4. Change **Version** to "New version"
-5. Click **Deploy**
+An intake form submission is 1 write. You'd need 20,000 submissions per day to hit the limit.

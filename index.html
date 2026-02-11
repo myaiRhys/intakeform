@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Client Intake Form</title>
+
+  <!-- Firebase SDK (compat version - works as simple script tags) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1016,46 +1021,31 @@
   }
 
   // =====================================================
-  // GOOGLE SHEETS SETUP INSTRUCTIONS
+  // FIREBASE SETUP
   // =====================================================
-  // 1. Create a new Google Sheet
-  // 2. Go to Extensions > Apps Script
-  // 3. Delete any code there and paste this:
-  //
-  //    function doPost(e) {
-  //      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  //      var data = JSON.parse(e.postData.contents);
-  //
-  //      // Add headers on first submission
-  //      if (sheet.getLastRow() === 0) {
-  //        var headers = ["Timestamp"].concat(Object.keys(data));
-  //        sheet.appendRow(headers);
-  //      }
-  //
-  //      // Build row matching header order
-  //      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  //      var row = headers.map(function(header) {
-  //        if (header === "Timestamp") return new Date().toISOString();
-  //        var val = data[header];
-  //        if (Array.isArray(val)) return val.join(", ");
-  //        return val || "";
-  //      });
-  //
-  //      sheet.appendRow(row);
-  //
-  //      return ContentService
-  //        .createTextOutput(JSON.stringify({ status: "ok" }))
-  //        .setMimeType(ContentService.MimeType.JSON);
-  //    }
-  //
-  // 4. Click Deploy > New deployment
-  // 5. Type = "Web app"
-  // 6. Execute as = "Me", Who has access = "Anyone"
-  // 7. Click Deploy and copy the URL
-  // 8. Paste that URL below:
+  // 1. Go to https://console.firebase.google.com
+  // 2. Create a new project (or use an existing one)
+  // 3. Go to Project Settings > General > Your apps > Add app (Web)
+  // 4. Copy your firebaseConfig values and paste them below
+  // 5. Go to Firestore Database > Create database > Start in test mode
+  // 6. That's it - submissions will appear in a "submissions" collection
   // =====================================================
 
-  var GOOGLE_SHEETS_URL = ""; // <-- Paste your Apps Script web app URL here
+  var firebaseConfig = {
+    apiKey: "",            // <-- Paste your values here
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+
+  // Initialise Firebase (only if configured)
+  var db = null;
+  if (firebaseConfig.apiKey) {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }
 
   function showSuccess() {
     document.querySelectorAll(".step").forEach(function (el) {
@@ -1082,24 +1072,22 @@
     submitBtn.textContent = "Submitting...";
     submitBtn.disabled = true;
 
-    // Send to Google Sheets if URL is configured
-    if (GOOGLE_SHEETS_URL) {
-      fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      })
-      .then(function () {
-        showSuccess();
-      })
-      .catch(function (err) {
-        console.error("Failed to save to Google Sheets:", err);
-        showSuccess();
-        document.getElementById("submitError").style.display = "block";
-      });
+    // Add timestamp
+    formData.submittedAt = new Date().toISOString();
+
+    // Save to Firebase if configured
+    if (db) {
+      db.collection("submissions").add(formData)
+        .then(function () {
+          showSuccess();
+        })
+        .catch(function (err) {
+          console.error("Failed to save to Firebase:", err);
+          showSuccess();
+          document.getElementById("submitError").style.display = "block";
+        });
     } else {
-      console.warn("GOOGLE_SHEETS_URL is not set. Submission only logged to console.");
+      console.warn("Firebase is not configured. Submission only logged to console.");
       showSuccess();
     }
   }
